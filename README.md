@@ -61,7 +61,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
  * [Setting up Git for Windows and connecting to GitHub](http://help.github.com/win-set-up-git/)
  * [Forking a GitHub repository](http://help.github.com/fork-a-repo/)
  * [The simple guide to GIT guide](http://rogerdudler.github.com/git-guide/)
- * [Open an issue](https://github.com/imperugo/StackExchange.Redis.Extensions/issues) if you encounter a bug or have a suggestion for improvements/features
+ * [Open an issue](https://github.com/imperugo/Imperugo.DependencyInjection.Extensions/issues) if you encounter a bug or have a suggestion for improvements/features
 
 
 Once you're familiar with Git and GitHub, clone the repository and start contributing.
