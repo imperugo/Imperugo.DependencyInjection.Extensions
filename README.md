@@ -8,7 +8,7 @@ The library is signed and completely compatible with the **.Net Standard 2.0**
 ##Install via Nuget 
 
 ```
-PM> Install-Package SImperugo.DependencyInjection.Extensions
+PM> Install-Package Imperugo.DependencyInjection.Extensions
 ```
 
 ## How to use it
