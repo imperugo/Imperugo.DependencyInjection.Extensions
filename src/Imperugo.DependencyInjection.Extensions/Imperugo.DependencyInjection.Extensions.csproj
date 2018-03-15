@@ -7,7 +7,7 @@
 		<Description>
 			If you are in love with a lean ConfigureService method into your startup class but you ahve tons of packages/services to register, that's your solution.
 		</Description>
-		<VersionPrefix>1.0.0</VersionPrefix>
+		<VersionPrefix>2.0.0</VersionPrefix>
 		<Authors>Ugo Lattanzi</Authors>
 		<Copyright>Ugo Lattanzi</Copyright>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>

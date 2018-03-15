@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +11,25 @@ namespace Imperugo.DependencyInjection.Extensions.Extensions
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static void AddPackageServices(this IServiceCollection services,  IEnumerable<Assembly> assembliesToScan = null)
+		public static void AddPackageServices(this IServiceCollection services, 
+																	IEnumerable<Assembly> assembliesToScan)
+		{
+			AddPackageServices2(services, null, false, null, assembliesToScan);
+		}
+
+		public static void AddPackageServices(this IServiceCollection services,
+			Func<string, bool> condition = null,
+			bool onlyLoaded = false,
+			string[] folderToReadAssemblies = null)
+		{
+			AddPackageServices2(services, condition, onlyLoaded, folderToReadAssemblies, null);
+		}
+
+		private static void AddPackageServices2(this IServiceCollection services, 
+																Func<string, bool> condition = null , 
+																bool onlyLoaded = false, 
+																string[] folderToReadAssemblies = null, 
+																IEnumerable<Assembly> assembliesToScan = null)
 		{
 			var container = services.BuildServiceProvider();
 
@@ -21,7 +38,7 @@ namespace Imperugo.DependencyInjection.Extensions.Extensions
 
 			if (assembliesToScan == null)
 			{
-				assembliesToScan = ScanOnlyTechnogymAssemblies();
+				assembliesToScan = GetAssembliesToScan(condition, onlyLoaded, folderToReadAssemblies);
 			}
 
 			var installers = assembliesToScan
@@ -47,32 +64,61 @@ namespace Imperugo.DependencyInjection.Extensions.Extensions
 			}
 		}
 
-		private static IEnumerable<Assembly> ScanOnlyTechnogymAssemblies()
+		private static IEnumerable<Assembly> GetAssembliesToScan(Func<string, bool> condition, 
+																								bool onlyLoaded, 
+																								string[] folderToReadAssemblies)
 		{
-			Assembly[] loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-			// Prevent to scan useless assembly and it makes NSB Startup faster
-			string dirname = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-			var directory = new DirectoryInfo(dirname);
-			var files = directory.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
-			var assemblies = new List<Assembly>();
-			foreach (var file in files)
+			if (condition == null)
 			{
-				var assemblyName = Path.GetFileNameWithoutExtension(file.Name);
-
-				Assembly alreadyLoadedAssembly = loadedAssemblies.FirstOrDefault(x => x.GetName().Name == assemblyName);
-				if (alreadyLoadedAssembly != null)
-				{
-					assemblies.Add(alreadyLoadedAssembly);
-					continue;
-				}
-
-				var asbly = Assembly.LoadFrom(file.FullName);
-				assemblies.Add(asbly);
+				condition = (x) => true;
 			}
 
-			return assemblies;
-		}
+			if (folderToReadAssemblies == null)
+			{
+				folderToReadAssemblies = new[] {Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)};
+			}
 
+			Assembly[] loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+			var assembliesToScan = new List<Assembly>(loadedAssemblies);
+
+			if (!onlyLoaded)
+			{
+				var notLoaded = Assembly.GetEntryAssembly().GetReferencedAssemblies();
+
+				foreach (var assemblyName in notLoaded)
+				{
+					if (condition.Invoke(assemblyName.FullName))
+					{
+						var loaded = Assembly.Load(assemblyName);
+						assembliesToScan.Add(loaded);
+					}
+				}
+			}
+
+			foreach (var folderToReadAssembly in folderToReadAssemblies)
+			{
+				var directory = new DirectoryInfo(folderToReadAssembly);
+				var files = directory.GetFiles("*.dll", SearchOption.TopDirectoryOnly);
+			
+				foreach (var file in files)
+				{
+					var assemblyName = Path.GetFileNameWithoutExtension(file.Name);
+
+					if (condition.Invoke(assemblyName))
+					{
+						bool alreadyLoaded =  assembliesToScan.Any(x => x.GetName().FullName == assemblyName);
+
+						if (!alreadyLoaded)
+						{
+							var loadedAssembly = Assembly.LoadFrom(file.FullName);
+							assembliesToScan.Add(loadedAssembly);
+						}
+					}
+				}
+			}
+
+			return assembliesToScan;
+		}
 	}
 }

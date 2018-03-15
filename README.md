@@ -1,6 +1,7 @@
 # Imperugo.DependencyInjection.Extensions
 
-**Imperugo.DependencyInjection.Extensions** is a library that allows you to auto register packages into your Microsoft Dependency Injection framework
+**Imperugo.DependencyInjection.Extensions** is a library that allows you to auto register packages into your Microsoft Dependency Injection framework.
+See the example [here]()
 The library is signed and completely compatible with the **.Net Standard 2.0**
 
 
@@ -54,6 +55,37 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 	//.....
 }
 ```
+
+Only needed Assemblies
+
+```csharp
+public IServiceProvider ConfigureServices(IServiceCollection services)
+{
+	services.AddPackageServices(x => x.StartsWith("MyNamespace"));
+
+	//.....
+}
+```
+
+```csharp
+public IServiceProvider ConfigureServices(IServiceCollection services)
+{
+	// (optional send null) If you want to scan only needed assemblies
+	Func<string, bool> condition = (x) => x.StartsWith("MyNamespace");
+	
+	// (optional send null) This disable the package to scan assemblues that aren't load yet
+	bool scanOnlyLoadedAssemblies = true; 
+
+	// (optional send null) If you want to load assemblies from a folder
+	bool pluginFolder = "C:\Temp";
+
+	services.AddPackageServices(condition, scanOnlyLoadedAssemblies, pluginFolder);
+
+	//.....
+}
+```
+
+Check the example [here]()
 
 ## Contributing
 **Getting started with Git and GitHub**
