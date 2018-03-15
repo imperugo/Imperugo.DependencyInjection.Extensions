@@ -1,7 +1,7 @@
 # Imperugo.DependencyInjection.Extensions
 
 **Imperugo.DependencyInjection.Extensions** is a library that allows you to auto register packages into your Microsoft Dependency Injection framework.
-See the example [here]()
+See the example [here](https://github.com/imperugo/Imperugo.DependencyInjection.Extensions/tree/master/src)
 The library is signed and completely compatible with the **.Net Standard 2.0**
 
 
@@ -85,7 +85,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-Check the example [here]()
+Check the example [here](https://github.com/imperugo/Imperugo.DependencyInjection.Extensions/tree/master/src)
 
 ## Contributing
 **Getting started with Git and GitHub**
